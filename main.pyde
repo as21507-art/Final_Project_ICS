@@ -9,7 +9,6 @@ import globals as gb
 # show = False
 
 my_tank = tnk.Tank(1, 300, 20)
-my_other_tank = tnk.Tank(2, 1500, 40)
 
 def setup():
     size(gb.full_screenX, gb.full_screenY)
@@ -24,25 +23,16 @@ def draw():
     #     my_bar.display()
     #     his_bar.display()
     line(0, gb.ground_level, gb.full_screenX, gb.ground_level)
-    my_tank.display()
-    my_other_tank.display()
-    my_tank.move()
-    my_other_tank.move()
-    
+    my_tank.display()   
+    my_tank.tank_action() 
     
 def keyPressed():
     my_tank.key_press(key, keyCode)
-    my_other_tank.key_press(key, keyCode)
     
 def keyReleased():
     my_tank.key_release(key, keyCode)
-    my_other_tank.key_release(key, keyCode)
     
-        
-# def mouseClicked():
-#     # global show
-#     # show = True
-#     # my_bar.change_health(80)
-#     # his_bar.change_health(10)
+def mouseClicked():
+    my_tank.mouse_click(mouseX, mouseY)
     
     
