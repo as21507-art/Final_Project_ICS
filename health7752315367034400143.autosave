@@ -1,0 +1,54 @@
+import globals as gb
+
+class Health:
+
+	def __init__(self, player):
+		self.x = gb.horizontal_health_bar_position[player]
+		self.y = gb.vertical_health_bar_position
+		self.w = gb.health_bar_width
+		self.h = gb.health_bar_height
+		self.health = 100
+		self.colour = [103, 235, 52]
+		self.animate = 0
+
+	def display(self):
+		noFill()
+		rect(self.x, self.y, self.w, self.h)
+		fill(self.colour[0], self.colour[1], self.colour[2])
+		rect(self.x, self.y, int(self.w * self.health / 100), self.h)
+		self.animate_colour()
+
+	def interpolate(self, colour_1, colour_2, factor, lower):
+		for i in range(3):
+			self.colour[i] = colour_1[i] + ((self.health - lower)/25)(colour_2[i] - colour_1[i])
+
+	def change_colour(self, factor):
+		if self.health >= 75:
+			temp_2 = [102, 255, 102]
+			temp_1 = [204, 255, 51]
+			lower = 75
+		elif self.health >=50:
+			temp_2 = [204, 255, 51]
+			temp_1 = [255, 255, 0]
+			lower = 50
+		elif self.health >=25:
+			temp_2 = [255, 255, 0]
+			temp_1 = [255, 153, 0]
+			lower = 25
+		else:
+			temp_2 = [255, 153, 0]
+			temp_1 = [204, 51, 0]
+			lower = 0
+		self.interpolate(temp_2, temp_1, factor, lower)
+			
+	def animate_colour(self):
+		if self.animate != 0:
+			for i in range(2):
+				self.animate = self.animate - 0.2
+				self.health = self.health - 0.2
+			self.change_colour(int(self.animate))
+
+	def change_health(self, damage):
+		self.animate = damage
+		self.health = self.health - damage
+	
