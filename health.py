@@ -1,12 +1,12 @@
-import globals as gb
+import globals
 
 class Health:
 
 	def __init__(self, player):
-		self.x = gb.horizontal_health_bar_position[player]
-		self.y = gb.vertical_health_bar_position
-		self.w = gb.health_bar_width
-		self.h = gb.health_bar_height
+		self.x = globals.horizontal_health_bar_position[player - 1]
+		self.y = globals.vertical_health_bar_position
+		self.w = globals.health_bar_width
+		self.h = globals.health_bar_height
 		self.health = 100
 		self.colour = [103, 235, 52]
 		self.animate = 0
@@ -64,3 +64,24 @@ class Health:
 	def change_health(self, damage):
 		self.animate = damage
 	
+
+# class Power:
+
+# 	def __init__(self, player):
+# 		self.x = globals.horizontal_power_bar_position[player - 1]
+# 		self.y = globals.vertical_power_bar_position
+# 		self.w = globals.power_bar_width
+# 		self.h = globals.power_bar_height
+# 		self.health = 100
+# 		self.colour = [103, 235, 52]
+# 		self.power = 0
+
+# 	def display(self):
+# 		noFill()
+# 		rect(self.x, self.y, self.w, self.h)							# Outline of the health bar
+# 		fill(self.colour[0], self.colour[1], self.colour[2])			# Setting the colour of the health bar
+# 		rect(self.x, self.y, int(self.w * self.power / 100), self.h)	# Remaining health as colour
+
+# 	# Converts velocity into scale of 0 to 100, where 0 is the min velocity and 100 is the max velocity 
+# 	def change_power(self, velocity):
+# 		self.power = int(100 * (velcoity - globals.default_bullet_min_velocity)/ (globals.default_bullet_max_velocity - globals.default_bullet_min_velocity)
