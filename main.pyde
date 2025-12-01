@@ -13,7 +13,12 @@ def draw():
     
 def keyPressed():
     if main_game.phase == 1:
-        main_game.game.key_press(key, keyCode)
+        if key == 'p':
+            main_game.game_paused = True               # Game can be paused only in gameplay phase
+        else:
+            main_game.game.key_press(key, keyCode)
+    if main_game.phase == 2:
+        main_game.outro.key_press(key)
     
 def keyReleased():
     if main_game.phase == 1:
@@ -30,6 +35,5 @@ def mouseReleased():
 def mouseClicked():
     if main_game.phase == 0:
         main_game.intro.handle_mouse()
-
-    
-    
+    if main_game.game_paused:
+        main_game.pause.handle_mouse()
