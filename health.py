@@ -3,20 +3,24 @@ import globals
 class Health:
 
 	def __init__(self, player):
-		self.x = globals.horizontal_health_bar_position[player - 1]
-		self.y = globals.vertical_health_bar_position
-		self.w = globals.health_bar_width
-		self.h = globals.health_bar_height
-		self.health = 100
-		self.colour = [103, 235, 52]
-		self.animate = 0
+		self.player = player															# Current player, 1 or 2
+		self.w = globals.health_bar_width												# Width of health bar
+		self.h = globals.health_bar_height												# Height of health bar
+		self.x = globals.horizontal_health_bar_position[player - 1] - self.w // 2 		# Converting centre x to upperleft x
+		self.y = globals.vertical_health_bar_position - self.h // 2 					# Converting centre y to upperleft y
+		self.health = 100																# Stores remaining health of the player (0 to 100)
+		self.colour = [103, 235, 52]													# Stores the colour of health bar
+		self.animate = 0																# Variable that regulates the animation of changing health
 
 	# Draws the rectangle
 	def make_health_bar(self):
+		fill(self.colour[0], self.colour[1], self.colour[2])  							# Setting the colour of the health bar
+		noStroke()
+		rect(self.x, self.y, int(self.w * self.health / 100), self.h)  					# Fills remaining health
 		noFill()
-		rect(self.x, self.y, self.w, self.h)							# Outline of the health bar
-		fill(self.colour[0], self.colour[1], self.colour[2])			# Setting the colour of the health bar
-		rect(self.x, self.y, int(self.w * self.health / 100), self.h)	# Remaining health as colour
+		stroke(0)
+		strokeWeight(2)
+		rect(self.x, self.y, self.w, self.h)											# Outline of the health bar
 
 	# Draws the rectangle and updates the colour
 	def display(self):
@@ -42,20 +46,20 @@ class Health:
 			temp_2 = [180, 204, 0]
 			temp_1 = [179, 179, 0]
 			lower = 25
-		elif self.health > 0:
+		elif int(self.health) > 0:
 			temp_2 = [179, 179, 0]
 			temp_1 = [180, 41, 0]
 			lower = 0
 		else:
 			self.health = 0
-			return
+			return None							# No interpolation of colour when health is 0
 		self.interpolate(temp_2, temp_1, lower)
 			
 	# Decrements health quickly in the begining and slowly towards the end
 	def animate_colour(self):
 		if int(self.animate) != 0:
-			self.animate = self.animate - (1 + self.animate / 20)
-			self.health = self.health - (1 + self.animate / 20)
+			self.animate = self.animate - (1 + self.animate / 20)			# Non-linear, decreasing speed
+			self.health = self.health - (1 + self.animate / 20)				# Decrements health too
 		else:
 			self.animate = 0     		# Resets the animate to 0
 		self.change_colour()			# Changes the colour of health bar if required
