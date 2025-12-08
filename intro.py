@@ -3,17 +3,69 @@ import globals
 
 class Intro:
 
-	def __init__(self):
+	def __init__(self, player_names):
+		# Initialising the buttons
 		self.play = Play(int(globals.full_screenX * 0.5), int(globals.full_screenY * globals.play_position), globals.play_button, "play.png", "hover.png")																	
 		self.tutorial = Tutorial(globals.full_screenX // 2 - globals.tutorial_button[0] // 2 - globals.mute_button[0] //2 - globals.button_spacing, int(globals.full_screenY * globals.other_position), globals.tutorial_button, "tutorial.png")
 		self.mute = Mute(globals.full_screenX // 2, int(globals.full_screenY * globals.other_position), globals.mute_button,"mute.png", True)
 		self.quit = Quit(globals.full_screenX // 2 + globals.mute_button[0] //2 + globals.button_spacing + globals.quit_button[0] //2, int(globals.full_screenY * globals.other_position), globals.quit_button, "quit.png")	
-		self.logo = loadImage(os.getcwd() + r"\\images\logo.png")									# Image for logo
-		self.bgImg = loadImage(os.getcwd() + r"\\images\background.png")
+		self.logo = loadImage(os.getcwd() + r"\\images\logo.png")
+		self.bgImg = loadImage(os.getcwd() + r"\\images\intro_background.png")
+		# Attributes to allow changing names of players in intro screen
+		self.names = player_names
+		self.intro_font = createFont("PressStart2P-Regular.ttf", 15)
+		self.names_spaceX = [700, 1000]
+		self.names_spaceY = 0.8
+		self.name_spaceW = 200
+		self.name_spaceH = 60
+		self.edit_name = -1													# -1 if nothing is highlighted, 0 and 1 if the user wants to change names of players
+		self.vs = loadImage(os.getcwd() + r"\\images\vs.png")
 
 	# Displays the background for intro screen
 	def display_background(self):
 		image(self.bgImg, 0, 0)
+
+	# Upper_left corner for the boxes where the players can enter their names (Name Box)
+	def upper_left(self, i, x):								# Returns upper X if x = true, returns upper y if x = False
+		if x:
+			return self.names_spaceX[i] - self.name_spaceW // 2
+		else:
+			return int(globals.full_screenY * self.names_spaceY) - self.name_spaceH // 2
+
+	# Displays Name Box for both players
+	def display_names(self):
+		stroke(255)
+		strokeWeight(1)
+		textAlign(CENTER, CENTER)
+		textFont(self.intro_font)
+		image(self.vs, globals.full_screenX // 2 - 25, int(globals.full_screenY * self.names_spaceY) - 50)
+		for i in range(2):
+			fill(0)
+			rect(self.upper_left(i, True), self.upper_left(i, False), self.name_spaceW, self.name_spaceH)	# Displays the box
+			if self.edit_name == i:
+				fill(255)																						# If highlighted
+			else:
+				fill(155)																						# Not highlighted
+			text(self.names[i] + "_", self.names_spaceX[i], int(globals.full_screenY * self.names_spaceY))		# Displays the text
+
+
+	# Editing the name
+	def name_edit(self):
+		if self.edit_name != -1:
+			if key == BACKSPACE and len(self.names[self.edit_name]) > 0:						# Deleting if backspace is pressed
+				self.names[self.edit_name] = self.names[self.edit_name][:-1]
+			elif key != BACKSPACE and len(self.names[self.edit_name]) < 12:						# Adding characters if the key is not backspace
+				try:
+					self.names[self.edit_name] = self.names[self.edit_name] + key
+				except TypeError:																# Handles error if the key can not be added to the string
+					return
+
+	# Check if the user clicked on Name Box
+	def check_name_box(self):
+		for i in range(2):
+			if self.upper_left(i, True) < mouseX < self.upper_left(i, True) + self.name_spaceW and self.upper_left(i, False) < mouseY < self.upper_left(i, False) + self.name_spaceH:
+				self.edit_name = i
+				break
 
 	# Displays the logo of the game
 	def display_logo(self):
@@ -27,6 +79,8 @@ class Intro:
 		self.tutorial.display()
 		self.mute.display()
 		self.quit.display()
+		self.display_names()
+		# Pop ups are displayed only if they are activated by the user
 		if self.tutorial.pop_up_open:
 			self.tutorial.display_pop()
 		if self.quit.pop_up_open:
@@ -34,6 +88,7 @@ class Intro:
 
 	# Handles mouse_clicks
 	def handle_mouse(self):
+		self.edit_name = -1 				# Do not highlight the name box if the user clicks off the box
 		if self.quit.pop_up_open:			# if Quit pop up is open then only enable features within the pop-up
 			self.quit.mouse_click()
 		elif self.tutorial.pop_up_open:		# if Tutorial pop up is open then only enable features within the pop-up
@@ -43,6 +98,7 @@ class Intro:
 			self.tutorial.mouse_click()
 			self.mute.mouse_click()
 			self.quit.mouse_click()
+			self.check_name_box()
 
 
 class Button:
@@ -79,7 +135,7 @@ class PopUp:
 		self.w = w
 		self.h = h
 		self.bgimg = loadImage(os.getcwd() + r"\\images" + "\\" + img_name)
-		
+
 	def display(self):
 		image(self.bgimg, self.x, self.y, self.w, self.h, 0, 0, self.w, self.h)
 
@@ -95,16 +151,17 @@ class Play(Button):
 		if Button.mouse_click(self):
 			self.start = True							# Games starts on clicking play
 
+	# Returns true if the mouse is within the bounds of the button (hovering over the button)
 	def hover(self):
 		upper_x, upper_y = self.get_upper_left()
 		if upper_x < mouseX < upper_x + self.w and upper_y < mouseY < upper_y + self.h:
 			return True
 		return False
 
-	def display(self): 									# Polymorphism to implement the hover effect
+	def display(self): 										# Polymorphism to implement the hover effect
 		if not self.hover():
 			Button.display(self)
-		else:
+		else:												# Display a different image when the user is hovering
 			upper_x, upper_y = self.get_upper_left()
 			image(self.hover_image, upper_x, upper_y)
 
@@ -114,17 +171,18 @@ class Tutorial(Button):
 		Button.__init__(self, x, y, dim, name)
 		# Dimensions and coordinates of the pop_up screen
 		self.pop_up = []
-		for i in range(1, 6):
+		for i in range(1, 7):
 			self.pop_up.append(PopUp(int(globals.full_screenX * 0.25), int(globals.full_screenY * 0.2), int(globals.full_screenX * 0.5), int(globals.full_screenY * 0.65), str(i) + ".png"))
 		self.pop_up_open = False												# Checks if the pop-up is open, mouse behaves differently if it is
-		self.slide = 0															# Stores the current slide of tutorial displayed
-		self.prev = Button(int(self.pop_up[0].x + self.pop_up[0].w * 0.1 + globals.quit_button[0] // 2), int(self.pop_up[0].y + self.pop_up[0].h * 0.9 - globals.tutorial_button[1] // 2), globals.tutorial_button, "prev.png")		# Yes button
-		self.next = Button(int(self.pop_up[0].x + self.pop_up[0].w * 0.9 - globals.quit_button[0] // 2), int(self.pop_up[0].y + self.pop_up[0].h * 0.9 - globals.tutorial_button[1] // 2), globals.tutorial_button, "next.png") 		# No button
+		self.slide = 0															# Stores the current slide of tutorial displayed on the screen
+		self.prev = Button(int(self.pop_up[0].x + self.pop_up[0].w * 0.1 + globals.quit_button[0] // 2), int(self.pop_up[0].y + self.pop_up[0].h * 0.9 - globals.tutorial_button[1] // 2), globals.tutorial_button, "prev.png")
+		self.next = Button(int(self.pop_up[0].x + self.pop_up[0].w * 0.9 - globals.quit_button[0] // 2), int(self.pop_up[0].y + self.pop_up[0].h * 0.9 - globals.tutorial_button[1] // 2), globals.tutorial_button, "next.png")
 		self.cancel = Button(int(self.pop_up[0].x + self.pop_up[0].w - globals.mute_button[0] // 2), int(self.pop_up[0].y + globals.cancel_button[1] // 2), globals.cancel_button, "cancel.png")
 
 	# Displays a pop_up screen, disabling other buttons
 	def display_pop(self):
 		self.pop_up[self.slide].display()				# Displays the current slide of pop_up
+		# Buttons within the pop-up screen that can be accessed
 		self.prev.display()
 		self.next.display()
 		self.cancel.display()
@@ -139,7 +197,7 @@ class Tutorial(Button):
 				if self.slide > 0:
 					self.slide -= 1
 			elif self.next.mouse_click():				# Goes to next slide
-				if self.slide < 4:
+				if self.slide < 5:
 					self.slide += 1
 			elif self.cancel.mouse_click():				# Closes the pop_up
 				self.pop_up_open = False
@@ -150,7 +208,7 @@ class Mute(Button):
 		Button.__init__(self, x, y, dim, name)
 		self.is_unmute = is_unmute							# Flag which makes the mute button act as unmute button depending on its value
 
-	# Music is paused and unpaused on clicking the mute button
+	# Music is mutes or unmuted on clicking the mute button
 	def mouse_click(self):
 		if Button.mouse_click(self):
 			if self.is_unmute:
