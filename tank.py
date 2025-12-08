@@ -1,5 +1,5 @@
-import os, math
-import globals
+import os
+import globals, bar
 
 class Tank:
 
@@ -21,6 +21,7 @@ class Tank:
 		self.mouse_start_y = 0				# Y coordinate of click and hols
 		self.distance = 0					# Distance between drag and initial click
 		self.velocity = 0					# Calculated velocity of the bullet
+		self.power_bar = [bar.Power(1), bar.Power(2)]			# Helps player visualise the velocity in a bar
 		# Flag for the phase where the tank stops all activity and shoots bullet
 		self.bullet_phase = False
 		# List storing images of tank of different angles
@@ -30,48 +31,47 @@ class Tank:
 			self.pics.append(loadImage(os.getcwd() + r"\\Tank images" + "\\" + name))
 
 	# Sets velocity when key is pressed
-	def key_press(self, input_key, input_key_code):
+	def key_press(self):
 		if self.moving_phase:
 			if self.player == 1:						# if player 1, then only unlock the ASW keys
-				if input_key == 'a':
+				if key == 'a':
 					self.vleft = 5						# Tank moves left with 'a' key
-				if input_key == 'd':
+				if key == 'd':
 					self.vright = 5						# Tank moves right with 'd' key
-				if input_key == 's':
+				if key == 's':
 					self.moving_phase = False
 					self.angle_phase = True     		# Angle phase comes directly after the player fixes the position
 					self.vleft = 0
 					self.vright = 0
 			if self.player == 2:						# if player 2, then only unlock the arrow keys
-				if input_key_code == LEFT:
+				if keyCode == LEFT:
 					self.vleft = 5						# Tank moves left with left arrow key
-				if input_key_code == RIGHT:
+				if keyCode == RIGHT:
 					self.vright = 5						# Tank moves right with right arrow key
-				if input_key_code == DOWN and self.player == 2:
+				if keyCode == DOWN and self.player == 2:
 					self.moving_phase = False
 					self.angle_phase = True     		# Angle phase comes directly after the player fixes the position
 					self.vleft = 0
 					self.vright = 0
 		elif self.angle_phase:
-			if self.player == 1 and input_key == 's':						# Player 1 can toggle between angle phase and moving phase
+			if self.player == 1 and key == 's':			# Player 1 can toggle between angle phase and moving phase
 				self.moving_phase = True
 				self.angle_phase = False
-			if self.player == 2 and input_key_code == DOWN:					# Player 2 can toggle between angle phase and moving phase
+			if self.player == 2 and keyCode == DOWN:	# Player 2 can toggle between angle phase and moving phase
 				self.moving_phase = True
 				self.angle_phase = False
 
-		
 	# Rests the velocity to zero when the corresponding key is released
-	def key_release(self, input_key, input_key_code):
+	def key_release(self):
 		if self.player == 1:
-			if input_key == 'a':
+			if key == 'a':
 				self.vleft = 0
-			if input_key == 'd':
+			if key == 'd':
 				self.vright = 0
 		if self.player == 2:
-			if input_key_code == LEFT:
+			if keyCode == LEFT:
 				self.vleft = 0
-			if input_key_code == RIGHT:
+			if keyCode == RIGHT:
 				self.vright = 0
 
 	# Updates the horizontal position
@@ -105,24 +105,22 @@ class Tank:
 					self.angle_increase = True		# Increasing phase for nozzle starts at 0 degrees
 
 	# Stops tank motions and proceeds to velocity selector
-	def mouse_press(self, centreX, centreY):
-		if self.angle_phase or self.moving_phase:
+	def mouse_press(self):
+		if self.angle_phase:
 			self.angle_phase = False										# Stops angle animation
-			self.moving_phase = False										# Stops motion of the tank
 			self.velocity_phase = True										# Enables velocity selection
-			self.mouse_start_x, self.mouse_start_y = centreX, centreY 		# Records position of click and hold
+			self.mouse_start_x, self.mouse_start_y = mouseX, mouseY 		# Records position of click and hold
 
 	# Records the velocity and proceeds to shooting bullets if the velocity is selected, otherwise goes again to the moving phase
 	def mouse_release(self):
 		if self.velocity_phase:												# Prevents from shooting when it's not velocity phase
-			self.velocity_selector()										# Calculates the velocity using distance of drag
 			if self.velocity == 0:
-				self.moving_phase = True									# Minimal drag means no velocity selected, start again
+				self.angle_phase = True										# Minimal drag means no velocity selected, so back to angle phase
 			else:
 				self.bullet_phase = True									# Proceed to shooting bullet
 			self.velocity_phase = False										# All tank related phases come to end, no more interactivity after shooting
 
-	# Displays a circle and the cross on the screen as the starting point of drag
+	# Displays a circle and the cross at the point where the user clicks on the screen as the starting point of drag
 	def fiducial_marker(self):
 		noFill()
 		stroke(0)
@@ -147,6 +145,12 @@ class Tank:
 		upper_x, upper_y = self.get_upper_left()
 		image(self.pics[self.angle // 10], upper_x, upper_y, globals.default_tank_width, globals.default_tank_height, 150*(2 - self.player), 0, 150*(self.player - 1), 178)
 
+	# Interactive Power bar displayed
+	def interact_power(self):
+		self.power_bar[self.player - 1].display()
+		self.velocity_selector()  										# Calculates the velocity using distance of drag
+		self.power_bar[self.player - 1].change_level(self.velocity)		# Uses velocity as a parameter for the bar
+
 	# Manipulates the tank based on the current phase of the game
 	def tank_action(self):
 		if self.moving_phase:
@@ -155,4 +159,5 @@ class Tank:
 			self.animate_angle()
 		elif self.velocity_phase:
 			self.fiducial_marker()
-		return self.bullet_phase			# returns True only if the player shoots bullet with certain velocity
+			self.interact_power()
+		return self.bullet_phase			# returns True only if the player shoots bullet with non-zero velocity
