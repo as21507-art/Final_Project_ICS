@@ -1,13 +1,13 @@
 # Final_Project_ICS
-Setting up the application <br>
-The folder main contains six Python files: tank, bar, bullet, intro, globals, and game. It also includes a 
-processing file in Python mode: main.pyde, which is the main program that should be executed. The 
+**Setting up the application** <br>
+The folder main contains six Python files: **tank, bar, bullet, intro, globals, and game**. It also includes a 
+processing file in Python mode: **main.pyde**, which is the main program that should be executed. The 
 main program makes reference to the six Python modules during execution. This helps in the 
 decomposition of the problem and makes it easy to work on a particular feature of the game. It also 
-contains four folders: tank images, images, sounds, and data (stores fonts). To run the game, make sure 
+contains four folders: **tank images, images, sounds,** and **data** (stores fonts). To run the game, make sure 
 that the “minim” library is installed. If any error occurs, please save and run again to see if the issue is 
 resolved. <br><br>
-Intro Screen <br>
+**Intro Screen** <br>
 ● The play button (text is highlighted when hovered) starts the game. <br>
 ● The tutorial button displays a pop-up of instructions on how to play the game (this contains 6 
 slides). <br>
@@ -16,7 +16,7 @@ slides). <br>
 ● Below, there are spaces to change the names of the players (default is player 1 and player 2). And 
 it allows a maximum of 12 characters. The name can be entered by clicking on the box (after 
 which it will be highlighted) and typing. <br><br>
-The Main Game <br>
+**The Main Game** <br>
 ● The game will display the following: background, tanks, and player names with health bars. <br>
 ● The turn of the player will be displayed on the screen until the user interacts with the device.<br> 
 ● Player 1 can move using the A and D keys, and change angle using the S key. <br>
@@ -31,15 +31,15 @@ considered not to have made the selection, and the tank will continue changing a
 ● After the bullet is shot, the effect on the opponent’s health will be displayed on the health bar. 
 ● The players change turns as indicated by the prompt before each player’s turn. <br>
 ● The game ends when one player wins, and the other player has zero health. <br><br>
-Pause <br>
+**Pause** <br>
 ● The game can be paused by pressing “P” and resumed by clicking on the Resume button. <br>
 ● It also has features like a tutorial and a mute button, like the intro screen. <br>
 ● It has a “Main menu” option, which ends the game without any results and takes the users to the 
 intro screen. <br><br>
-Outro Screen <br>
+**Outro Screen** <br>
 ● This part displays the winner and an instruction to return to the intro screen. The game can be 
 exited from the intro screen if required. <br><br>
-Sources for graphics, sounds, and fonts <br>
+**Sources for graphics, sounds, and fonts** <br>
 Image of tank: “Panther Ausf. D 1943 (Side View)” by ThunderFenrirson <br>
 Source:https://www.furaffinity.net/view/44398781/ (Fur Affinity) <br>
 Image of play button: “blank button. blank square 3d push button” by Aquir <br>
